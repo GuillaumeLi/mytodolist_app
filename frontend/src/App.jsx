@@ -26,12 +26,22 @@ function App() {
     setTasks(tasks.map(task => task.id === id ? { ...task, completed : completed} : task));
   }
 
+  function handleEditTask(id, newTitle, newDescription) {
+    setTasks(tasks.map(task => task.id === id ? { ...task, title: newTitle, description: newDescription } : task));
+  }
+
   return (
     <div>
       <h1>My To-Do List</h1>
       <button onClick={() => setShowForm(true)}>Add task</button>
-      {showForm && (<TaskForm onAddTask={handleAddTask} onClose={() => setShowForm(false)} />)}
-      <TaskList tasks={tasks} onDeleteTask={handleDeleteTask} onToggleTaskCompletion={handleToggleTaskCompletion} onEditTask={handleEditTask} />
+      {showForm && (
+        <TaskForm onSubmit={handleAddTask} onClose={() => setShowForm(false)} />
+      )}
+      <TaskList 
+        tasks={tasks} 
+        onDeleteTask={handleDeleteTask} 
+        onToggleTaskCompletion={handleToggleTaskCompletion} 
+        onEditTask={handleEditTask} />
     </div>
   );
 }
