@@ -1,31 +1,35 @@
 import React, { useState } from 'react';
 
-export function TaskForm({ onAddTask }) {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+export function TaskForm({ onAddTask, onClose }) {
+    const [title, setTitle] = useState(currentTitle);
+    const [description, setDescription] = useState(currentDescription);
 
 
     return (
-        <div>
+        <dialog open>
             <form onSubmit={(e) => {
                 e.preventDefault();
                 onAddTask(title.trim(), description.trim());
                 setTitle('');
                 setDescription('');
+                onClose();
             }}>
+                <label>Title:</label>
                 <input
-                    placeholder="Enter task title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
                 />
+                <br />
+                <label>Description:</label>
                 <input
-                    placeholder="Enter task description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
+                <br />
                 <button type="submit">Add Task</button>
+                <button type="button" onClick={onClose}>Cancel</button>
             </form>
-        </div>
+        </dialog>
     )
 }

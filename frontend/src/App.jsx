@@ -6,6 +6,7 @@ import TaskList from './components/TaskList';
 function App() {
   
   const [tasks, setTasks] = useState(exampleTasks);
+  const [showForm, setShowForm] = useState(false);
 
   function handleAddTask(title, description) {
     const newTask = {
@@ -28,9 +29,9 @@ function App() {
   return (
     <div>
       <h1>My To-Do List</h1>
-      <button onClick={() => setTasks([])}>Add task</button>
-      <TaskForm onAddTask={handleAddTask} />
-      <TaskList tasks={tasks} onDeleteTask={handleDeleteTask} onToggleTaskCompletion={handleToggleTaskCompletion} />
+      <button onClick={() => setShowForm(true)}>Add task</button>
+      {showForm && (<TaskForm onAddTask={handleAddTask} onClose={() => setShowForm(false)} />)}
+      <TaskList tasks={tasks} onDeleteTask={handleDeleteTask} onToggleTaskCompletion={handleToggleTaskCompletion} onEditTask={handleEditTask} />
     </div>
   );
 }
