@@ -8,6 +8,7 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
+  // Fetch tasks from the backend (GET request) when the component mounts
   useEffect(() => {
     fetch("http://localhost:3000/tasks")
       .then(response => response.json())
@@ -16,15 +17,27 @@ function App() {
       });
   }, []);
 
-  function handleAddTask(title, description) {
+  // Function to handle adding a new task
+  async function handleAddTask(title, description) {
     const newTask = {
-      id: crypto.randomUUID(),
-      title,
-      description,
-      completed: false
+        title,
+        description,
     };
-    setTasks([...tasks, newTask]);
-  }
+
+    // Send the new task to the backend (POST request)
+    const response = await fetch("http://localhost:3000/tasks", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newTask)
+    });
+
+    // Get the created task from the response (with the id and completed status assigned by the backend)
+    const createdTask = await response.json();
+
+    setTasks([...tasks, createdTask]);
+}
 
   function handleDeleteTask(id) {
     setTasks(tasks.filter(task => task.id !== id));

@@ -33,7 +33,12 @@ app.post("/tasks", (req, res) => {
     console.log("POST reçu !");
     console.log(req.body);
 
-    const newTask = req.body;
+    const newTask = {
+        id: crypto.randomUUID(),
+        title: req.body.title,
+        description: req.body.description,
+        completed: false
+    };
 
     tasks.push(newTask);
 
