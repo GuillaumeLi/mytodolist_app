@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { TaskForm } from './components/TaskForm';
 import TaskList from './components/TaskList';
 
 function App() {
   
-  const [tasks, setTasks] = useState(exampleTasks);
+  const [tasks, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/tasks")
+      .then(response => response.json())
+      .then(data => {
+        setTasks(data);
+      });
+  }, []);
 
   function handleAddTask(title, description) {
     const newTask = {
