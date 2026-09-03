@@ -1,18 +1,22 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 const tasks = [
     {
         id: 1,
         title: "Apprendre Node.js",
+        description: "Comprendre les bases de Node.js et comment créer des applications backend.",
         completed: false
     },
     {
         id: 2,
         title: "Apprendre Express",
+        description: "Comprendre les bases d'Express et comment créer des routes et des middlewares.",
         completed: false
     }
 ];
