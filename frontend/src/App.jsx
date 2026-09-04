@@ -37,11 +37,19 @@ function App() {
     const createdTask = await response.json();
 
     setTasks([...tasks, createdTask]);
-}
-
-  function handleDeleteTask(id) {
-    setTasks(tasks.filter(task => task.id !== id));
   }
+
+  async function handleDeleteTask(id) {
+    // Send a DELETE request to the backend to delete the task
+    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        method: "DELETE"
+    });
+
+    // If the deletion was successful, update the state to remove the task from the list
+    if (response.ok) {
+        setTasks(tasks.filter(task => task.id !== id));
+    }
+}
 
   function handleToggleTaskCompletion(id, completed) {
     setTasks(tasks.map(task => task.id === id ? { ...task, completed : completed} : task));
