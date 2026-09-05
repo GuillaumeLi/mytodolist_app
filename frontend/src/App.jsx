@@ -51,12 +51,41 @@ function App() {
     }
 }
 
-  function handleToggleTaskCompletion(id, completed) {
-    setTasks(tasks.map(task => task.id === id ? { ...task, completed : completed} : task));
+  async function handleToggleTaskCompletion(id, completed) {
+    // Send a PATCH request to the backend to update the task's completion status
+    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ completed: completed })
+    });
+
+    // If the update was successful, update the state to reflect the change
+    if (response.ok) {
+      const updatedTask = await response.json();
+      setTasks(tasks.map(task => task.id === id ? updatedTask : task));
+    }
   }
 
-  function handleEditTask(id, newTitle, newDescription) {
-    setTasks(tasks.map(task => task.id === id ? { ...task, title: newTitle, description: newDescription } : task));
+  async function handleEditTask(id, newTitle, newDescription) {
+    // Send a PATCH request to the backend to update the task's information
+    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          title: newTitle,
+          description: newDescription
+        })
+      });
+
+      // If the update was successful, update the state to reflect the change
+      if (response.ok) {
+        const updatedTask = await response.json();
+        setTasks(tasks.map(task => task.id === id ? updatedTask : task));
+      }
   }
 
   return (
