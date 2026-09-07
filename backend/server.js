@@ -35,10 +35,25 @@ app.post("/tasks", (req, res) => {
     console.log("POST received !");
     console.log(req.body);
 
+    // Validate the request body
+    if (req.body.title === undefined ||
+        typeof req.body.title !== "string" ||
+        req.body.title.trim() === "") {
+        return res.status(400).json({message: "Title must be defined and must be a non-empty string"});
+    }
+    if (req.body.description !== undefined &&
+        typeof req.body.description !== "string") {
+        return res.status(400).json({message: "Description must be a string"});
+    }
+    if (req.body.completed !== undefined &&
+        typeof req.body.completed !== "boolean") {
+        return res.status(400).json({message: "Completed must be a boolean"});
+    }
+
     const newTask = {
         id: crypto.randomUUID(),
-        title: req.body.title,
-        description: req.body.description,
+        title: req.body.title.trim(),
+        description: req.body.description.trim(),
         completed: false
     };
 
@@ -71,16 +86,35 @@ app.patch("/tasks/:id", (req, res) => {
         return res.status(404).json({ message: "Task not found" });
     }
 
+    // Check if the request body is empty
+    if (Object.keys(req.body).length === 0) {
+        return res.status(400).json({message: "No data to update"});
+    }
+    
+    // Validate the request body
+    if (req.body.title !== undefined &&
+        (typeof req.body.title !== "string" ||
+        req.body.title.trim() === "")) {
+        return res.status(400).json({message: "Title must be a non-empty string"});
+    }
+    if (req.body.description !== undefined &&
+        typeof req.body.description !== "string" ) {
+        return res.status(400).json({message: "Description must be a string"});
+    }
+    if (req.body.completed !== undefined &&
+        typeof req.body.completed !== "boolean") {
+        return res.status(400).json({message: "Completed must be a boolean"});
+    }
+
+    // Update the task's properties if they are provided in the request body
+    if (req.body.title !== undefined) {
+        task.title = req.body.title.trim();
+    }
+    if (req.body.description !== undefined) {
+        task.description = req.body.description.trim();
+    }
     if (req.body.completed !== undefined) {
         task.completed = req.body.completed;
-    }
-
-    if (req.body.title !== undefined) {
-        task.title = req.body.title;
-    }
-
-    if (req.body.description !== undefined) {
-        task.description = req.body.description;
     }
 
     res.status(200).json(task);
