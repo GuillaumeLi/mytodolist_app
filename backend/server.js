@@ -1,37 +1,39 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
+const { Pool } = require("pg");
 
 const app = express();
 
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
+
 app.use(cors());
 app.use(express.json());
-
-const tasks = [
-    {
-        id: crypto.randomUUID(),
-        title: "Apprendre Node.js",
-        description: "Comprendre les bases de Node.js et comment créer des applications backend.",
-        completed: false
-    },
-    {
-        id: crypto.randomUUID(),
-        title: "Apprendre Express",
-        description: "Comprendre les bases d'Express et comment créer des routes et des middlewares.",
-        completed: false
-    }
-];
 
 app.get("/", (req, res) => {
     res.send("Hello from my backend!");
 });
 
 // Endpoint to get all tasks
-app.get("/tasks", (req, res) => {
-    res.json(tasks);
+app.get("/tasks", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM tasks");
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Error while querying tasks"});
+    }
 });
 
 // Endpoint to create a new task
-app.post("/tasks", (req, res) => {
+app.post("/tasks", async (req, res) => {
     console.log("POST received !");
     console.log(req.body);
 
@@ -50,41 +52,48 @@ app.post("/tasks", (req, res) => {
         return res.status(400).json({message: "Completed must be a boolean"});
     }
 
-    const newTask = {
-        id: crypto.randomUUID(),
-        title: req.body.title.trim(),
-        description: req.body.description.trim(),
-        completed: false
-    };
-
-    tasks.push(newTask);
-    res.status(201).json(newTask);
+    try {
+        const description = req.body.description !== null ? req.body.description.trim() : null;
+        const result = await pool.query(
+            `INSERT INTO tasks (title, description)
+            VALUES ($1, $2) 
+            RETURNING *`,
+            [req.body.title.trim(), description]);
+        const newTask = result.rows[0];
+        res.status(201).json(newTask);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Error while creating a new task"});
+    }
 });
 
 // Endpoint to delete a task by id
-app.delete("/tasks/:id", (req, res) => {
+app.delete("/tasks/:id", async (req, res) => {
     const id = req.params.id;
-    const taskIndex = tasks.findIndex(task => task.id === id);
 
-    if (taskIndex === -1) {
-        return res.status(404).json({ message: "Task not found" });
+    try {
+        const result = await pool.query(`
+            DELETE FROM tasks
+            WHERE id = $1`, [id]);
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({message: "Task not found"});
+        }
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Error while deleting task"});
     }
-
-    tasks.splice(taskIndex, 1);
-    res.status(204).send();
 });
 
 // Endpoint to update a task by id
-app.patch("/tasks/:id", (req, res) => {
+app.patch("/tasks/:id", async (req, res) => {
     console.log("PATCH received");
     console.log(req.body);
 
     const id = req.params.id;
-    const task = tasks.find(task => task.id === id);
-
-    if (!task) {
-        return res.status(404).json({ message: "Task not found" });
-    }
+    const fields = [];
+    const values = [];
 
     // Check if the request body is empty
     if (Object.keys(req.body).length === 0) {
@@ -108,16 +117,37 @@ app.patch("/tasks/:id", (req, res) => {
 
     // Update the task's properties if they are provided in the request body
     if (req.body.title !== undefined) {
-        task.title = req.body.title.trim();
+        fields.push(`title = $${fields.length + 1}`);
+        values.push(req.body.title.trim());
     }
     if (req.body.description !== undefined) {
-        task.description = req.body.description.trim();
+        fields.push(`description = $${fields.length + 1}`);
+        values.push(req.body.description.trim());
     }
     if (req.body.completed !== undefined) {
-        task.completed = req.body.completed;
+        fields.push(`completed = $${fields.length + 1}`);
+        values.push(req.body.completed);
     }
+    values.push(id);
 
-    res.status(200).json(task);
+    const query = `
+        UPDATE tasks
+        SET ${fields.join(", ")}
+        WHERE id = $${values.length}
+        RETURNING *`;
+    
+    try {
+        const result = await pool.query(query, values);
+
+        if(result.rows.length === 0) {
+            return res.status(404).json({message: "Task not found"});
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Error while updating task"});
+    }
 });
 
 app.listen(3000, () => {
