@@ -6,15 +6,95 @@ function isValidTitle(title) {
 
 // GET request
 async function getTasks (req, res) {
-    const { completed } = req.query;
+    const { completed, search, sort, order, page, limit } = req.query;
 
+    // --------------- Completed and search validation section ------------
     if(completed !== undefined && completed !== "true" && completed !== "false") {
         return res.status(400).json({message: "Completed must be true or false"});
     }
+    // Converting completed into boolean because completed is a query parameter (string value)
+    const completedValue = completed !== undefined ? completed === "true" : undefined;
+    const searchValue = search?.trim();
+    
+    // --------------- Sorting validation section -------------------------
+    const sortField = sort ?? "title";
+    //const sortField = sort ?? "created_at";
+    const sortOrder = (order ?? "asc").toLowerCase();
+    const allowedSorts = ["created_at", "title", "completed"];
+
+    if (!allowedSorts.includes(sortField)) {
+        return res.status(400).json({message: "Invalide sort field"});
+    }
+    if (!["asc", "desc"].includes(sortOrder)) {
+        return res.status(400).json({message: "Invalid sort order"});
+    }
+
+    // --------------- Pagination validation section ----------------------
+    const pageNumber = Number(page ?? "1");
+    const limitNumber = Number(limit ?? "10");
+
+    if(!Number.isInteger(pageNumber) || pageNumber < 1) {
+        return res.status(400).json({message: "Page must be a positive integer"});
+    }
+    if(!Number.isInteger(limitNumber) || limitNumber < 1) {
+        return res.status(400).json({message: "Limit must be a positive integer"});
+    }
+    if (limitNumber > 100) {
+        return res.status(400).json({message: "Limit cannot be greater than 100"});
+    }
+    
+    const offset = (pageNumber - 1) * limitNumber;
+    
+    // --------------- Values for the WHERE query -------------------------
+    const conditions = []
+    const values = []
+    
+    if(completedValue !== undefined) {
+        conditions.push(`completed = $${values.length + 1}`);
+        values.push(completedValue);
+    }
+    if(searchValue !== undefined) {
+        conditions.push(`title ILIKE $${values.length + 1} OR description ILIKE $${values.length + 1}`);
+        values.push(`%${searchValue}%`);
+    }
+
+    const whereClause = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+    
+    // --------------- Pagination placeholders -----------------------------
+    const limitPlaceholder = values.length + 1;
+    const offsetPlaceholder = values.length + 2;
+    
+    // --------------- Constructing count query ----------------------------
+    const countQuery = `SELECT COUNT(*) FROM tasks ${whereClause}`;
+    
+    // --------------- Constructing query ----------------------------------
+    const query =`
+        SELECT * FROM tasks
+        ${whereClause}
+        ORDER BY ${sortField} ${sortOrder}
+        LIMIT $${limitPlaceholder}
+        OFFSET $${offsetPlaceholder}`;
+
+    const queryValues = [...values, limitNumber, offset];
 
     try {
-        const result = await pool.query("SELECT * FROM tasks");
-        res.json(result.rows);
+        const countResult = await pool.query(countQuery, values);
+        const result = await pool.query(query, queryValues);
+
+        // Total tasks and page of the filter query
+        const total = Number(countResult.rows[0].count);
+        const totalPages = Math.ceil(total / limitNumber);
+
+        res.json({
+            tasks: result.rows,
+            pagination: {
+                page: pageNumber,
+                limit: limitNumber,
+                total,
+                totalPages
+            }
+        });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({message: "Error while querying tasks"});

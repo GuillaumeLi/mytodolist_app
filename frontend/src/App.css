@@ -1,3 +1,7 @@
 .task-item:hover {
     background-color: lightgray;
 }
+
+.loading-container {
+    min-height: 24px;
+}
