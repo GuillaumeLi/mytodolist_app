@@ -1,31 +1,27 @@
 import { TaskForm } from './components/TaskForm';
-import TaskList from './components/TaskList';
-import TaskFilters from './components/TaskFilters';
-import Pagination from './components/Pagination';
-import useTasks from './hooks/useTasks';
+import { TaskList } from './components/TaskList';
+import { TaskFilters } from './components/TaskFilters';
+import { Pagination } from './components/Pagination';
+import { useTasks } from './hooks/useTasks';
 
 function App() {
 
   const {
     tasks, error, loading, pagination,
-    currentPage, setCurrentPage,
-    pageSize, setPageSize,
-    search, setSearch,
-    completedFilter, setCompletedFilter,
-    sort, setSort,
-    order, setOrder,
-    handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask
+    currentPage, pageSize,
+    search, completedFilter, sort, order,
+    handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask,
+    handleNextPage, handlePreviousPage, handlePageSizeChange,
+    handleSearchChange, handleCompletedFilterChange, handleSortChange, handleOrderChange
   } = useTasks();
 
   return (
     <div>
       <h1>My To-Do List</h1>
 
-      <TaskFilters search={search} setSearch={setSearch}
-        completedFilter={completedFilter} setCompletedFilter={setCompletedFilter}
-        sort={sort} setSort={setSort}
-        order={order} setOrder={setOrder}
-        setCurrentPage={setCurrentPage}>
+      <TaskFilters search={search} completedFilter={completedFilter} order={order} sort={sort} 
+      onSearchChange={handleSearchChange} onCompletedFilterChange={handleCompletedFilterChange}
+      onSortChange={handleSortChange} onOrderChange={handleOrderChange}>
       </TaskFilters>      
 
       <br></br>
@@ -45,9 +41,8 @@ function App() {
         onEditTask={handleEditTask}>
       </TaskList>
 
-      <Pagination pageSize={pageSize} setPageSize={setPageSize}
-        currentPage={currentPage} setCurrentPage={setCurrentPage}
-        pagination={pagination}>
+      <Pagination pageSize={pageSize} pagination={pagination} currentPage={currentPage} 
+        onNextPage={handleNextPage} onPreviousPage={handlePreviousPage} onPageSizeChange={handlePageSizeChange}>
       </Pagination>
 
     </div>

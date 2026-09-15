@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { getTasks, addTask, deleteTask, toggleTaskCompletion, editTask } from "../services/tasksApi";
 
-function useTasks () {
+export function useTasks () {
     const [tasks, setTasks] = useState([]);
     
     const [error, setError] = useState(null);
@@ -44,6 +44,7 @@ function useTasks () {
                     setCurrentPage(1);
                 }
             } else if (currentPage > data.pagination.totalPages) {
+                // The current page no longer exists after a deletion
                 setCurrentPage(data.pagination.totalPages);
             }
 
@@ -59,7 +60,6 @@ function useTasks () {
         loadTasks();
     }, [currentPage, pageSize, debouncedSearch, completedFilter, sort, order]);
 
-    // Function to handle adding a new task
     async function handleAddTask (title, description) {
         try {
             await addTask(title, description);
@@ -69,7 +69,6 @@ function useTasks () {
         }
     }
 
-    // Function to handle deleting a task
     async function handleDeleteTask (id) {
         try {
             await deleteTask(id);
@@ -79,7 +78,6 @@ function useTasks () {
         }
     }
 
-    // Function to handle task completion
     async function handleToggleTaskCompletion(id, completed) {
         try {
             await toggleTaskCompletion(id, completed);
@@ -89,7 +87,6 @@ function useTasks () {
         }
     }
 
-    // Function to task edit
     async function handleEditTask (id, newTitle, newDescription) {
         try {
             await editTask(id, newTitle, newDescription);
@@ -99,20 +96,45 @@ function useTasks () {
         }
     }
 
+    function handleNextPage () {
+        setCurrentPage((prevPage) => prevPage + 1);
+    }
+
+    function handlePreviousPage () {
+        setCurrentPage((prevPage) => prevPage - 1);
+    }
+
+    function handlePageSizeChange (newPageSize) {
+        setPageSize(newPageSize);
+        // A page size change can make the current page invalid, so we always return to page 1
+        setCurrentPage(1);
+    }
+
+    function handleSearchChange (newSearch) {
+        setSearch(newSearch);
+    }
+
+    function handleCompletedFilterChange (completedFilterValue) {
+        setCompletedFilter(completedFilterValue);
+        setCurrentPage(1);
+    }
+
+    function handleSortChange (sortValue) {
+        setSort(sortValue);
+        setCurrentPage(1);
+    }
+
+    function handleOrderChange (orderValue) {
+        setOrder(orderValue);
+        setCurrentPage(1);
+    }
+
     return {
-        tasks, setTasks,
-        error, setError,
-        loading, setLoading,
-        pagination, setPagination,
-        currentPage, setCurrentPage,
-        pageSize, setPageSize,
-        search, setSearch,
-        debouncedSearch, setDebouncedSearch,
-        completedFilter, setCompletedFilter,
-        sort, setSort,
-        order, setOrder,
-        handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask
+        tasks, error, loading, pagination,
+        currentPage, pageSize,
+        search, completedFilter, sort, order,
+        handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask,
+        handleNextPage, handlePreviousPage, handlePageSizeChange,
+        handleSearchChange, handleCompletedFilterChange, handleSortChange, handleOrderChange
     };
 }
-
-export default useTasks;

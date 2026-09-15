@@ -1,21 +1,18 @@
 export function TaskFilters({
-    search, setSearch,
-    completedFilter, setCompletedFilter,
-    sort, setSort,
-    order, setOrder,
-    setCurrentPage,
+    search, completedFilter, order, sort,
+    onSearchChange, onCompletedFilterChange, onOrderChange, onSortChange
 }) {
     return (
         <>
             <input value={search} 
                 onChange={(e) => {
-                setSearch(e.target.value);}}>
+                onSearchChange(e.target.value);
+                }}>
             </input>
 
             <select value={completedFilter}
                 onChange={(e) => {
-                setCompletedFilter(e.target.value);
-                setCurrentPage(1);
+                onCompletedFilterChange(e.target.value);
                 }}>
                 <option value="">All tasks</option>
                 <option value="true">Completed</option>
@@ -24,8 +21,7 @@ export function TaskFilters({
 
             <select value={sort}
                 onChange={(e) => {
-                setSort(e.target.value);
-                setCurrentPage(1);
+                onSortChange(e.target.value);
                 }}>
                 <option value="title">Title</option>
                 <option value="completed">Status</option>
@@ -33,8 +29,7 @@ export function TaskFilters({
 
             <select value={order}
                 onChange={(e) => {
-                setOrder(e.target.value);
-                setCurrentPage(1);
+                onOrderChange(e.target.value);
                 }}>
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
