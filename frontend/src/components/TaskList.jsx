@@ -1,6 +1,6 @@
 import { TaskItem } from './TaskItem';
 
-export default function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
+export function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
 
     return (
         <div>
