@@ -42,10 +42,6 @@ export async function addTask (title, description) {
         const errorData = await response.json();
         throw new Error(errorData.message);
     }
-
-    // Get the created task from the response (with the id and completed status assigned by the backend)
-    const data = await response.json();
-    return data;
 }
 
 /* 
