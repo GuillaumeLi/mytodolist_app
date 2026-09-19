@@ -7,8 +7,7 @@ export function TaskFilters({
             <input value={search} 
                 onChange={(e) => {
                 onSearchChange(e.target.value);
-                }}>
-            </input>
+                }}/>
 
             <select value={completedFilter}
                 onChange={(e) => {

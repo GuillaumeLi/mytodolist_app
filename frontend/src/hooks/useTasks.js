@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { getTasks, addTask, deleteTask, toggleTaskCompletion, editTask } from "../services/tasksApi";
+
+const SEARCH_DEBOUNCE_DELAY = 300;
 
 export function useTasks () {
     const [tasks, setTasks] = useState([]);
@@ -8,7 +10,6 @@ export function useTasks () {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    // Pagination useStates
     const [pagination, setPagination] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(2);
@@ -18,113 +19,92 @@ export function useTasks () {
     const [sort, setSort] = useState("title");
     const [order, setOrder] = useState("asc");
 
-    // Debounce effect when user is writing in the search bar
-    useEffect(() => {
-        const debounceTimer = setTimeout(() => {
-        setDebouncedSearch(search);
-        setCurrentPage(1);
-        }, 300);
-
-        return () => {
-        clearTimeout(debounceTimer);
-        };
-    }, [search]);
-
-    // Function to load tasks after each action
-    async function loadTasks () {
+    const loadTasks = useCallback(async () => {
         setError(null);
         setLoading(true);
         try {
             const data = await getTasks({currentPage, pageSize, search: debouncedSearch, completedFilter, sort, order});
             setTasks(data.tasks);
             setPagination(data.pagination);
-
+            
             if (data.pagination.totalPages === 0) {
-                if (currentPage !== 0) {
-                    setCurrentPage(1);
-                }
+                setCurrentPage(1);
             } else if (currentPage > data.pagination.totalPages) {
                 // The current page no longer exists after a deletion
                 setCurrentPage(data.pagination.totalPages);
             }
-
+            
         } catch (error) {
             setError(error.message);
         } finally {
             setLoading(false);
         }
-    }
-
-    // Fetch tasks from the backend (GET request) when the component mounts
+    }, [currentPage, pageSize, debouncedSearch, completedFilter, sort, order]);
+    
     useEffect(() => {
         loadTasks();
-    }, [currentPage, pageSize, debouncedSearch, completedFilter, sort, order]);
+    }, [loadTasks]);
+    
+    useEffect(() => {
+        const debounceTimer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setCurrentPage(1);
+        }, SEARCH_DEBOUNCE_DELAY);
+
+        return () => {
+            clearTimeout(debounceTimer);
+        };
+    }, [search]);
 
     async function handleAddTask (title, description) {
-        try {
-            await addTask(title, description);
-            await loadTasks();
-        } catch (error) {
-            setError(error.message);
-        }
+        await addTask(title, description);
+        await loadTasks();
     }
 
-    async function handleDeleteTask (id) {
-        try {
-            await deleteTask(id);
-            await loadTasks();
-        } catch (error) {
-            setError(error.message);
-        }
+    async function handleDeleteTask(id) {
+        await deleteTask(id);
+        await loadTasks();
     }
 
     async function handleToggleTaskCompletion(id, completed) {
-        try {
-            await toggleTaskCompletion(id, completed);
-            await loadTasks();
-        } catch (error) {
-            setError(error.message);
-        }
+        await toggleTaskCompletion(id, completed);
+        await loadTasks();
     }
 
-    async function handleEditTask (id, newTitle, newDescription) {
-        try {
-            await editTask(id, newTitle, newDescription);
-            await loadTasks();
-        } catch (error) {
-            setError(error);
-        }
+    async function handleEditTask(id, newTitle, newDescription) {
+        await editTask(id, newTitle, newDescription);
+        await loadTasks();
     }
 
-    function handleNextPage () {
+    function handleNextPage() {
         setCurrentPage((prevPage) => prevPage + 1);
     }
 
-    function handlePreviousPage () {
+    function handlePreviousPage() {
         setCurrentPage((prevPage) => prevPage - 1);
     }
 
-    function handlePageSizeChange (newPageSize) {
+    function handlePageSizeChange(newPageSize) {
         setPageSize(newPageSize);
         // A page size change can make the current page invalid, so we always return to page 1
         setCurrentPage(1);
     }
 
-    function handleSearchChange (newSearch) {
+    function handleSearchChange(newSearch) {
         setSearch(newSearch);
     }
 
-    function handleCompletedFilterChange (completedFilterValue) {
+    function handleCompletedFilterChange(completedFilterValue) {
         setCompletedFilter(completedFilterValue);
         setCurrentPage(1);
     }
 
-    function handleSortChange (sortValue) {
+    function handleSortChange(sortValue) {
         setSort(sortValue);
         setCurrentPage(1);
     }
 
-    function handleOrderChange (orderValue) {
+    function handleOrderChange(orderValue) {
         setOrder(orderValue);
         setCurrentPage(1);
     }

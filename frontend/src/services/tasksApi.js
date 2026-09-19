@@ -1,5 +1,17 @@
-/*
-*/
+const API_BASE_URL = "http://localhost:3000";
+const TASKS_URL = `${API_BASE_URL}/tasks`;
+
+async function request(url, options = {}) {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+        const errorData = response.json().catch(() => null);
+        throw new Error(errorData?.message ?? "An unexpected error occured");
+    }
+
+    return response;
+}
+
 export async function getTasks ({ currentPage, pageSize, search, completedFilter, sort, order }) {
     const urlParams = new URLSearchParams();
             
@@ -14,79 +26,42 @@ export async function getTasks ({ currentPage, pageSize, search, completedFilter
         urlParams.set("completed", completedFilter);
     }
 
-    const url = `http://localhost:3000/tasks?${urlParams}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
-
-    const data = await response.json();
-    return data;
+    const url = `${TASKS_URL}?${urlParams}`;
+    const response = await request(url);
+    
+    return response.json();
 }
 
-/*
-*/
 export async function addTask (title, description) {
-    // Send the new task to the backend (POST request)
-    const response = await fetch("http://localhost:3000/tasks", {
+    await request(TASKS_URL, {
         method: "POST",
-        headers: {
+        headers : {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ title, description })
+        body : JSON.stringify({ title, description })
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
 }
 
-/* 
-*/
 export async function deleteTask (id) {
-    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
-        method: "DELETE"
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
+    await request(`${TASKS_URL}/${id}`, { method: "DELETE" });
 }
 
-/*
-*/
 export async function toggleTaskCompletion (id, completed) {
-    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+    await request(`${TASKS_URL}/${id}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ completed })
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
 }
 
-/*
-*/
-export async function editTask (id, newTitle, newDescription) {
-    const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+export async function editTask (id, title, description) {
+    await request(`${TASKS_URL}/${id}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ title: newTitle, description: newDescription })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-    }
+        body: JSON.stringify({ title,description })
+    })
 }

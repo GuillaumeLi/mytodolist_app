@@ -1,35 +1,38 @@
+const PAGE_SIZE_OPTIONS = [2, 5, 10, 20];
+
 export function Pagination({
     pageSize, currentPage, pagination,
     onNextPage, onPreviousPage, onPageSizeChange
 }){
     return (
-        <>
-            {pagination && pagination.totalPages > 1 && (
-                <div>
-                    <label>
-                        Tasks per page : 
-                        <select value={pageSize} 
-                        onChange={(e) => {
-                            onPageSizeChange(Number(e.target.value));
-                        }}>
-                        <option value="2">2</option>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        </select>
-                    </label>
-
-                    <button disabled={currentPage === 1} onClick={onPreviousPage}>
+        <nav aria-label="Pagination">
+            <label htmlFor="page-size">
+                Tasks per page : 
+            </label>
+            
+            <select id="page-size"
+            value={pageSize} 
+            onChange={(e) => {
+                onPageSizeChange(Number(e.target.value));
+            }}>
+                {PAGE_SIZE_OPTIONS.map(size => (
+                    <option key={size} value={size}>{size}</option>
+                ))}
+            </select>
+            
+            {pagination.totalPages > 1 && (
+                <>
+                    <button type="button" disabled={currentPage === 1} onClick={onPreviousPage}>
                         Previous
                     </button>
 
                     <span>Page {currentPage} of {pagination.totalPages}</span>
 
-                    <button disabled={currentPage >= pagination.totalPages} onClick={onNextPage}>
+                    <button type="button" disabled={currentPage >= pagination.totalPages} onClick={onNextPage}>
                         Next
                     </button>
-                </div>
+                </>
             )}
-        </>
+        </nav>
     );
 }
