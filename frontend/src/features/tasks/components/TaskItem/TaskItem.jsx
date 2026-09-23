@@ -2,9 +2,9 @@ import { useState, useId } from 'react';
 
 import { Pencil, Trash2, ChevronRight } from 'lucide-react';
 
-import { TaskForm } from './TaskForm';
-import { Dialog } from '../../../components/ui/Dialog';
-import { Confirmation } from '../../../components/ui/Confirmation';
+import { TaskForm } from '../TaskForm/TaskForm';
+import { Dialog } from '../../../../components/ui/Dialog/Dialog';
+import { Confirmation } from '../../../../components/ui/Confirmation/Confirmation';
 
 import "./TaskItem.css";
 

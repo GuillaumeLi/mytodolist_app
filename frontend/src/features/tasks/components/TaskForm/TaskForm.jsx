@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 
-import { Dialog } from '../../../components/ui/Dialog';
-import { Confirmation } from '../../../components/ui/Confirmation';
+import { Dialog } from '../../../../components/ui/Dialog/Dialog';
+import { Confirmation } from '../../../../components/ui/Confirmation/Confirmation';
 
 import './TaskForm.css';
 

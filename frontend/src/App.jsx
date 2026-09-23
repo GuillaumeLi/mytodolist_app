@@ -1,7 +1,7 @@
-import { TaskForm } from './features/tasks/components/TaskForm';
-import { TaskList } from './features/tasks/components/TaskList';
-import { TaskFilters } from './features/tasks/components/TaskFilters';
-import { Pagination } from './components/ui/Pagination';
+import { TaskForm } from './features/tasks/components/TaskForm/TaskForm';
+import { TaskList } from './features/tasks/components/TaskList/TaskList';
+import { TaskFilters } from './features/tasks/components/TaskFilters/TaskFilters';
+import { Pagination } from './components/ui/Pagination/Pagination';
 import { useTasks } from './features/tasks/hooks/useTasks';
 
 import './App.css';
