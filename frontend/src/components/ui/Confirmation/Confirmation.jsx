@@ -7,11 +7,11 @@ export function Confirmation ({ message, onCancel, onConfirm }) {
             <p className="confirmation-message">{message}</p>
 
             <div className="confirmation-actions">
-                <button type="button" onClick={onCancel}>
+                <button className="button" type="button" onClick={onCancel}>
                     Cancel
                 </button>
 
-                <button className="primary-button" type="button" onClick={onConfirm}>
+                <button className="button primary-button" type="button" onClick={onConfirm}>
                     Confirm
                 </button>
             </div>

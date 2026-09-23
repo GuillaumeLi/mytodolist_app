@@ -67,7 +67,7 @@ export function TaskForm ({ task = null, onSubmit, onClose }) {
     return (
         <div className="task-form">
             {!isEditing && (
-                <button type="button" onClick={() => setIsOpen(true)}>
+                <button className="button primary-button" type="button" onClick={() => setIsOpen(true)}>
                     Add task
                 </button>
             )}
@@ -107,10 +107,10 @@ export function TaskForm ({ task = null, onSubmit, onClose }) {
                         {formError && <p className="form-error" role="alert">{formError}</p>}
 
                         <div className="task-form-actions">
-                            <button type="button" onClick={handleClose}>
+                            <button className="button" type="button" onClick={handleClose}>
                                 Cancel
                             </button>
-                            <button type="submit" className="primary-button">
+                            <button type="submit" className="button primary-button">
                                 {isEditing ? "Save task" : "Add task"}
                             </button>
                         </div>

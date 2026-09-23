@@ -62,11 +62,6 @@
     text-align: left;
 }
 
-.task-expand-button:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-}
-
 .task-expand-button[aria-expanded="true"] .task-title {
     white-space: normal;
     overflow: visible;
@@ -136,11 +131,6 @@
 
 .task-actions .delete-button:hover {
     color: var(--color-danger);
-}
-
-.task-actions button:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
 }
 
 .task-error {
