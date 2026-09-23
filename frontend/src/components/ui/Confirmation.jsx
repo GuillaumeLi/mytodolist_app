@@ -1,3 +1,5 @@
+import './Confirmation.css';
+
 export function Confirmation ({ message, onCancel, onConfirm }) {
 
     return (

@@ -1,0 +1,171 @@
+.task-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+
+    transition: background-color 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.task-row {
+    padding-left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-checkbox {
+    flex-shrink: 0;
+    margin: 0;
+
+    width: 18px;
+    height: 18px;
+
+    accent-color: var(--color-primary);
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.task-checkbox:hover {
+    transform: scale(1.08);
+}
+
+.task-checkbox:checked {
+    accent-color: var(--color-success);
+}
+
+.task-checkbox:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.task-expand-button {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 16px 12px;
+
+    border: 0;
+    background-color: transparent;
+
+    color: var(--color-text);
+    text-align: left;
+}
+
+.task-expand-button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.task-expand-button[aria-expanded="true"] .task-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+}
+
+.task-title {
+    flex: 1;
+    font-weight: 600;
+    min-width: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-title-completed {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+.task-expand-icon {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    
+    transition: transform 0.2s ease;
+}
+
+.task-expand-button[aria-expanded="true"] .task-expand-icon {
+    transform: rotate(90deg);
+}
+
+.task-actions {
+    padding-right: 12px;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-actions button {
+    padding: 0;
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+
+    background-color: transparent;
+    color: var(--color-text-muted);
+
+    transition: 
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.task-actions button:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text);
+}
+
+.task-actions .delete-button:hover {
+    color: var(--color-danger);
+}
+
+.task-actions button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.task-error {
+    padding: 0 12px;
+    text-align: center;
+    color: var(--color-danger);
+}
+
+.task-details {
+    padding: 16px;
+    position: relative;
+}
+
+.task-details::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.task-details p {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}

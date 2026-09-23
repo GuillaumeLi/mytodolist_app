@@ -1,5 +1,7 @@
 import { TaskItem } from './TaskItem';
 
+import './TaskList.css';
+
 export function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
 
     return (

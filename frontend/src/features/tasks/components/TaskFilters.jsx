@@ -1,3 +1,5 @@
+import './TaskFilters.css';
+
 export function TaskFilters({
     search, completedFilter, order, sort,
     onSearchChange, onCompletedFilterChange, onOrderChange, onSortChange

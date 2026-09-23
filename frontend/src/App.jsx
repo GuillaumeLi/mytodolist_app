@@ -1,8 +1,10 @@
-import { TaskForm } from './components/TaskForm';
-import { TaskList } from './components/TaskList';
-import { TaskFilters } from './components/TaskFilters';
-import { Pagination } from './components/Pagination';
-import { useTasks } from './hooks/useTasks';
+import { TaskForm } from './features/tasks/components/TaskForm';
+import { TaskList } from './features/tasks/components/TaskList';
+import { TaskFilters } from './features/tasks/components/TaskFilters';
+import { Pagination } from './components/ui/Pagination';
+import { useTasks } from './features/tasks/hooks/useTasks';
+
+import './App.css';
 
 function App() {
 
@@ -17,19 +19,24 @@ function App() {
 
   return (
     <main className="app">
-      <h1>My To-Do List</h1>
 
-      <TaskFilters search={search} completedFilter={completedFilter} order={order} sort={sort} 
-      onSearchChange={handleSearchChange} onCompletedFilterChange={handleCompletedFilterChange}
-      onSortChange={handleSortChange} onOrderChange={handleOrderChange}
-      />
+      <header  className="app-header">
+        <h1>My To-Do List</h1>
+      </header>
 
-      <TaskForm onSubmit={handleAddTask}/>
+      <div className="task-toolbar">
+        <TaskFilters search={search} completedFilter={completedFilter} order={order} sort={sort} 
+        onSearchChange={handleSearchChange} onCompletedFilterChange={handleCompletedFilterChange}
+        onSortChange={handleSortChange} onOrderChange={handleOrderChange}
+        />
+
+        <TaskForm onSubmit={handleAddTask}/>
+      </div>
 
       <div className="loading-container">
         {loading && <p role="status">Loading...</p>}
         {error && <p role="alert">{error}</p>}
-        {!error && !loading && tasks.length === 0 && <p>No tasks found</p>}
+        {!error && !loading && tasks.length === 0 && <p className="empty-tasks-message">No tasks found</p>}
       </div>
 
       <TaskList 

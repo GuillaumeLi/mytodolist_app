@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import './Dialog.css';
+
 export function Dialog ({ isOpen, onRequestClose, children, ...dialogProps }) {
     const dialogRef = useRef(null);
 

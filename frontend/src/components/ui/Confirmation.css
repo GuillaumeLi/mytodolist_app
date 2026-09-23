@@ -1,0 +1,43 @@
+.confirmation {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.confirmation-message {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.confirmation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.confirmation-actions button {
+    height: var(--control-height);
+    padding: 0 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-surface);
+    color: var(--color-text);
+
+    transition: background-color 0.2s ease;
+}
+
+.confirmation-actions button:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.confirmation-actions .primary-button {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.confirmation-actions .primary-button:hover {
+    background-color: var(--color-primary-hover);
+}

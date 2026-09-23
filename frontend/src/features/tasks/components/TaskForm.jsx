@@ -3,6 +3,8 @@ import { useId, useState } from 'react';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Confirmation } from '../../../components/ui/Confirmation';
 
+import './TaskForm.css';
+
 export function TaskForm ({ task = null, onSubmit, onClose }) {
     const [title, setTitle] = useState(task?.title ?? '');
     const [description, setDescription] = useState(task?.description ?? "");

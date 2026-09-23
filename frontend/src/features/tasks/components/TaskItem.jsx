@@ -6,6 +6,8 @@ import { TaskForm } from './TaskForm';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Confirmation } from '../../../components/ui/Confirmation';
 
+import "./TaskItem.css";
+
 export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
