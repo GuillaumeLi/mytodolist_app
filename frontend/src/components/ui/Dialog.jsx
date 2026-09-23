@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function Dialog ({ isOpen, onRequestClose, children }) {
+export function Dialog ({ isOpen, onRequestClose, children, ...dialogProps }) {
     const dialogRef = useRef(null);
 
     useEffect(() => {
@@ -46,8 +46,11 @@ export function Dialog ({ isOpen, onRequestClose, children }) {
     }
 
     return (
-        <dialog ref={dialogRef}
-            onCancel={handleCancel}>
+        <dialog {...dialogProps} 
+            className="dialog"
+            ref={dialogRef}
+            onCancel={handleCancel}
+        >
             {children}
         </dialog>
     );
