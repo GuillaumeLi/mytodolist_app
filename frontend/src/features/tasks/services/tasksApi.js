@@ -12,7 +12,7 @@ async function request(url, options = {}) {
     return response;
 }
 
-export async function getTasks ({ currentPage, pageSize, search, completedFilter, sort, order }) {
+export async function getTasks ({ currentPage, pageSize, search, completedFilter, sort, order, signal }) {
     const urlParams = new URLSearchParams();
             
     urlParams.set("page", currentPage);
@@ -27,7 +27,7 @@ export async function getTasks ({ currentPage, pageSize, search, completedFilter
     }
 
     const url = `${TASKS_URL}?${urlParams}`;
-    const response = await request(url);
+    const response = await request(url, { signal });
     
     return response.json();
 }

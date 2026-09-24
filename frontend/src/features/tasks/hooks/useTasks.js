@@ -19,11 +19,16 @@ export function useTasks () {
     const [sort, setSort] = useState("title");
     const [order, setOrder] = useState("asc");
 
-    const loadTasks = useCallback(async () => {
+    const loadTasks = useCallback(async (signal) => {
         setError(null);
         setLoading(true);
         try {
-            const data = await getTasks({currentPage, pageSize, search: debouncedSearch, completedFilter, sort, order});
+            const data = await getTasks({currentPage, pageSize, search: debouncedSearch, completedFilter, sort, order, signal});
+            
+            if(signal?.aborted) {
+                return;
+            }
+            
             setTasks(data.tasks);
             setPagination(data.pagination);
             
@@ -35,14 +40,26 @@ export function useTasks () {
             }
             
         } catch (error) {
+            if (signal?.aborted || error.name === "ArbortError") {
+                return;
+            }
             setError(error.message);
+            throw error;
         } finally {
-            setLoading(false);
+            if(!signal?.aborted) {
+                setLoading(false);
+            }
         }
     }, [currentPage, pageSize, debouncedSearch, completedFilter, sort, order]);
     
     useEffect(() => {
-        loadTasks();
+        const controller = new AbortController();
+
+        loadTasks(controller.signal).catch(() => {});
+
+        return () => {
+            controller.abort();
+        }
     }, [loadTasks]);
     
     useEffect(() => {
