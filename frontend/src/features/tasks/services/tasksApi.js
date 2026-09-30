@@ -5,8 +5,8 @@ async function request(url, options = {}) {
     const response = await fetch(url, options);
 
     if (!response.ok) {
-        const errorData = response.json().catch(() => null);
-        throw new Error(errorData?.message ?? "An unexpected error occured");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message ?? "An unexpected error occurred");
     }
 
     return response;
@@ -33,13 +33,12 @@ export async function getTasks ({ currentPage, pageSize, search, completedFilter
 }
 
 export async function addTask (title, description) {
-    await request(TASKS_URL, {
+    const response = await request(TASKS_URL, {
         method: "POST",
-        headers : {
-            "Content-Type": "application/json"
-        },
+        headers : { "Content-Type": "application/json" },
         body : JSON.stringify({ title, description })
     });
+    return response.json();
 }
 
 export async function deleteTask (id) {
@@ -47,21 +46,19 @@ export async function deleteTask (id) {
 }
 
 export async function toggleTaskCompletion (id, completed) {
-    await request(`${TASKS_URL}/${id}`, {
+    const response = await request(`${TASKS_URL}/${id}`, {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed })
     });
+    return response.json();
 }
 
 export async function editTask (id, title, description) {
-    await request(`${TASKS_URL}/${id}`, {
+    const response = await request(`${TASKS_URL}/${id}`, {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title,description })
-    })
+    });
+    return response.json();
 }

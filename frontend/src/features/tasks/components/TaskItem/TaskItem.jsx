@@ -8,7 +8,7 @@ import { Confirmation } from '../../../../components/ui/Confirmation/Confirmatio
 
 import "./TaskItem.css";
 
-export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
+export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTask, isDeletingTask, isEditingTask, togglingTaskId }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -16,8 +16,9 @@ export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTas
     const [deleteError, setDeleteError] = useState(null);
     const [toggleError, setToggleError] = useState(null);
 
-    const detailsId= useId();
-    const hasDetails= Boolean(task.description);
+    const detailsId = useId();
+    const hasDetails = Boolean(task.description);
+    const isToggling = togglingTaskId === task.id;
 
     async function handleConfirmDelete() {
         setDeleteError(null);
@@ -50,6 +51,7 @@ export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTas
                 <input className="task-checkbox"
                     type="checkbox" 
                     checked={task.completed} 
+                    disabled={isToggling}
                     onChange={(e) => handleToggleTaskCompletion(task.id, e.target.checked)}
                     aria-label={
                         task.completed
@@ -107,6 +109,7 @@ export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTas
                     task={task}
                     onSubmit={(newTitle, newDescription) => onEditTask(task.id, newTitle, newDescription)}
                     onClose={() => setIsEditing(false)}
+                    isPending={isEditingTask}
                 />
             )}
 
@@ -116,9 +119,12 @@ export function TaskItem({ task, onDeleteTask, onToggleTaskCompletion, onEditTas
                 <Confirmation message="Are you sure you want to delete this task ?"
                     onConfirm={handleConfirmDelete}
                     onCancel={handleCancelDelete}
+                    isPending={isDeletingTask}
+                    confirmLabel="Delete"
+                    pendingLabel="Deleting..."
                 />
 
-                {deleteError && <p role="alert">{deleteError}</p>}
+                {deleteError && <p className="task-error" role="alert">{deleteError}</p>}
 
             </Dialog>
         </article>

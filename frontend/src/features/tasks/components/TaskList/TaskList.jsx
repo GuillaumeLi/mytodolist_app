@@ -2,7 +2,7 @@ import { TaskItem } from '../TaskItem/TaskItem';
 
 import './TaskList.css';
 
-export function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTask }) {
+export function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTask, isDeletingTask, isEditingTask, togglingTaskId }) {
 
     return (
         <div className="task-list">
@@ -13,6 +13,9 @@ export function TaskList({ tasks, onDeleteTask, onToggleTaskCompletion, onEditTa
                     onDeleteTask={onDeleteTask} 
                     onToggleTaskCompletion={onToggleTaskCompletion} 
                     onEditTask={onEditTask}
+                    isDeletingTask={isDeletingTask}
+                    isEditingTask={isEditingTask}
+                    togglingTaskId={togglingTaskId}
                 />
             ))}
         </div>

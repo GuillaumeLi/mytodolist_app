@@ -31,8 +31,12 @@
     transition: transform 0.2s ease;
 }
 
-.task-checkbox:hover {
+.task-checkbox:hover:not(:disabled) {
     transform: scale(1.08);
+}
+
+.task-checkbox:disabled {
+    cursor: default;
 }
 
 .task-checkbox:checked {
@@ -135,7 +139,7 @@
 
 .task-error {
     padding: 0 12px;
-    text-align: center;
+    text-align: left;
     color: var(--color-danger);
 }
 

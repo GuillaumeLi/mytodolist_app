@@ -39,8 +39,30 @@
     color: white;
 }
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
     background-color: var(--color-primary-hover);
+}
+
+.primary-button:disabled {
+    border-color: var(--color-primary-disabled);
+    background-color: var(--color-primary-disabled);
+    cursor: default;
+}
+
+.danger-button {
+    border-color: var(--color-danger);
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.danger-button:hover:not(:disabled) {
+    background-color: var(--color-danger-hover);
+}
+
+.danger-button:disabled {
+    border-color: var(--color-danger-disabled);
+    background-color: var(--color-danger-disabled);
+    cursor: default;
 }
 
 .form-control {
@@ -60,11 +82,6 @@
 
 .form-control:hover {
     background-color: var(--color-surface-hover);
-}
-
-.form-control:focus {
-    border-color: var(--color-primary);
-    outline: none;
 }
 
 .form-control:focus-visible {

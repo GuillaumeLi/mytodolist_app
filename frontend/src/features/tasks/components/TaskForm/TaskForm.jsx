@@ -5,7 +5,7 @@ import { Confirmation } from '../../../../components/ui/Confirmation/Confirmatio
 
 import './TaskForm.css';
 
-export function TaskForm ({ task = null, onSubmit, onClose }) {
+export function TaskForm ({ task = null, onSubmit, onClose, isPending }) {
     const [title, setTitle] = useState(task?.title ?? '');
     const [description, setDescription] = useState(task?.description ?? "");
 
@@ -84,6 +84,7 @@ export function TaskForm ({ task = null, onSubmit, onClose }) {
                     <Confirmation onConfirm={closeForm}
                         onCancel={handleConfirmationCancel}
                         message="Discard changes ?"
+                        confirmLabel="Discard"
                     />
                 ) : (
                     <form className="task-form-content" onSubmit={handleSubmit}>
@@ -110,8 +111,8 @@ export function TaskForm ({ task = null, onSubmit, onClose }) {
                             <button className="button" type="button" onClick={handleClose}>
                                 Cancel
                             </button>
-                            <button type="submit" className="button primary-button">
-                                {isEditing ? "Save task" : "Add task"}
+                            <button disabled={isPending} type="submit" className="button primary-button">
+                                {isPending ? "Saving..." : isEditing ? "Save task" : "Add task"}
                             </button>
                         </div>
                     </form>

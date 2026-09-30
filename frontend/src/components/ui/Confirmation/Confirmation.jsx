@@ -1,6 +1,6 @@
 import './Confirmation.css';
 
-export function Confirmation ({ message, onCancel, onConfirm }) {
+export function Confirmation ({ message, confirmLabel, pendingLabel, onCancel, onConfirm, isPending }) {
 
     return (
         <div className="confirmation">
@@ -11,8 +11,8 @@ export function Confirmation ({ message, onCancel, onConfirm }) {
                     Cancel
                 </button>
 
-                <button className="button primary-button" type="button" onClick={onConfirm}>
-                    Confirm
+                <button disabled={isPending} className="button danger-button" type="button" onClick={onConfirm}>
+                    {isPending ? pendingLabel : confirmLabel}
                 </button>
             </div>
         </div>

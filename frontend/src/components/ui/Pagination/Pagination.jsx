@@ -4,7 +4,8 @@ const PAGE_SIZE_OPTIONS = [2, 5, 10, 20];
 
 export function Pagination({
     pageSize, currentPage, pagination,
-    onNextPage, onPreviousPage, onPageSizeChange
+    onNextPage, onPreviousPage, onPageSizeChange,
+    isPlaceholderData
 }){
     if (!pagination) {
         return null;
@@ -32,13 +33,13 @@ export function Pagination({
             
             {pagination.totalPages > 1 && (
                 <div className="page-navigation">
-                    <button type="button" disabled={currentPage === 1} onClick={onPreviousPage}>
+                    <button type="button" disabled={isPlaceholderData || currentPage === 1} onClick={onPreviousPage}>
                         Previous
                     </button>
 
                     <span>Page {currentPage} of {pagination.totalPages}</span>
 
-                    <button type="button" disabled={currentPage >= pagination.totalPages} onClick={onNextPage}>
+                    <button type="button" disabled={isPlaceholderData || currentPage >= pagination.totalPages} onClick={onNextPage}>
                         Next
                     </button>
                 </div>

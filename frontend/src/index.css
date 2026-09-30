@@ -5,6 +5,7 @@
 
     --color-primary: #5b8def;
     --color-primary-hover: #4779d6;
+    --color-primary-disabled: #b8ccef;
 
     --color-text: #24324a;
     --color-text-muted: #718096;
@@ -12,7 +13,10 @@
     --color-border: #dfe6f0;
 
     --color-success: #35b27f;
+
     --color-danger: #ef7373;
+    --color-danger-hover: #d95f5f;
+    --color-danger-disabled: #f5caca;
 
     --radius-sm: 6px;
     --radius-md: 10px;

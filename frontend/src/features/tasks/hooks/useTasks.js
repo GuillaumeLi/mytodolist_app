@@ -1,16 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getTasks, addTask, deleteTask, toggleTaskCompletion, editTask } from "../services/tasksApi";
 
 const SEARCH_DEBOUNCE_DELAY = 300;
 
 export function useTasks () {
-    const [tasks, setTasks] = useState([]);
-    
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    const [pagination, setPagination] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(2);
     const [search, setSearch] = useState("");
@@ -19,48 +14,61 @@ export function useTasks () {
     const [sort, setSort] = useState("title");
     const [order, setOrder] = useState("asc");
 
-    const loadTasks = useCallback(async (signal) => {
-        setError(null);
-        setLoading(true);
-        try {
-            const data = await getTasks({currentPage, pageSize, search: debouncedSearch, completedFilter, sort, order, signal});
-            
-            if(signal?.aborted) {
-                return;
-            }
-            
-            setTasks(data.tasks);
-            setPagination(data.pagination);
-            
-            if (data.pagination.totalPages === 0) {
-                setCurrentPage(1);
-            } else if (currentPage > data.pagination.totalPages) {
-                // The current page no longer exists after a deletion
-                setCurrentPage(data.pagination.totalPages);
-            }
-            
-        } catch (error) {
-            if (signal?.aborted || error.name === "ArbortError") {
-                return;
-            }
-            setError(error.message);
-            throw error;
-        } finally {
-            if(!signal?.aborted) {
-                setLoading(false);
-            }
-        }
-    }, [currentPage, pageSize, debouncedSearch, completedFilter, sort, order]);
-    
+    const [togglingTaskId, setTogglingTaskId] = useState(null);
+
+    const queryClient = useQueryClient();
+    const taskQueryParams = { currentPage, pageSize, search: debouncedSearch, completedFilter, sort, order };
+
+    const tasksQuery = useQuery({
+        queryKey: ["tasks", taskQueryParams],
+        queryFn: ({ signal }) => getTasks({ ...taskQueryParams, signal }),
+        placeholderData: keepPreviousData,
+        staleTime: 30_000
+    });
+
+    const tasks = tasksQuery.data?.tasks ?? [];
+    const pagination = tasksQuery.data?.pagination ?? null;
+    const isFetchingTasks = tasksQuery.isFetching;
+    const error = tasksQuery.error?.message ?? null;
+
+    const invalidateTasks = () => queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
+    const addTaskMutation = useMutation({
+        mutationFn: ({ title, description }) => addTask(title, description),
+        onSuccess: invalidateTasks
+    });
+
+    const deleteTaskMutation = useMutation({
+        mutationFn: deleteTask,
+        onSuccess: invalidateTasks
+    });
+
+    const toggleTaskCompletionMutation = useMutation({
+        mutationFn: ({ id, completed }) => toggleTaskCompletion(id, completed),
+        onMutate: ({ id }) => { setTogglingTaskId(id); },
+        onSuccess: invalidateTasks,
+        onSettled: () => { setTogglingTaskId(null); }
+    });
+
+    const editTaskMutation = useMutation({
+        mutationFn: ({ id, newTitle, newDescription }) => editTask(id, newTitle, newDescription),
+        onSuccess: invalidateTasks
+    });
+
+    // Avoid incoherent current page value when deleting task
     useEffect(() => {
-        const controller = new AbortController();
+        const totalPages = tasksQuery.data?.pagination.totalPages;
 
-        loadTasks(controller.signal).catch(() => {});
-
-        return () => {
-            controller.abort();
+        if (totalPages === undefined) {
+            return;
         }
-    }, [loadTasks]);
+
+        if (totalPages === 0) {
+            setCurrentPage(1);
+        } else if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [tasksQuery.data, currentPage]);
     
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
@@ -73,24 +81,20 @@ export function useTasks () {
         };
     }, [search]);
 
-    async function handleAddTask (title, description) {
-        await addTask(title, description);
-        await loadTasks();
+    function handleAddTask (title, description) {
+        return addTaskMutation.mutateAsync({ title, description });
     }
 
-    async function handleDeleteTask(id) {
-        await deleteTask(id);
-        await loadTasks();
+    function handleDeleteTask(id) {
+        return deleteTaskMutation.mutateAsync(id);
     }
 
-    async function handleToggleTaskCompletion(id, completed) {
-        await toggleTaskCompletion(id, completed);
-        await loadTasks();
+    function handleToggleTaskCompletion(id, completed) {
+        return toggleTaskCompletionMutation.mutateAsync({ id, completed });
     }
 
-    async function handleEditTask(id, newTitle, newDescription) {
-        await editTask(id, newTitle, newDescription);
-        await loadTasks();
+    function handleEditTask(id, newTitle, newDescription) {
+        return editTaskMutation.mutateAsync({ id, newTitle, newDescription });
     }
 
     function handleNextPage() {
@@ -127,9 +131,12 @@ export function useTasks () {
     }
 
     return {
-        tasks, error, loading, pagination,
+        tasks, error, isFetchingTasks, pagination,
         currentPage, pageSize,
         search, completedFilter, sort, order,
+        isPlaceholderData: tasksQuery.isPlaceholderData,
+        isAddingTask: addTaskMutation.isPending, isDeletingTask: deleteTaskMutation.isPending,
+        togglingTaskId, isEditingTask: editTaskMutation.isPending,
         handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask,
         handleNextPage, handlePreviousPage, handlePageSizeChange,
         handleSearchChange, handleCompletedFilterChange, handleSortChange, handleOrderChange

@@ -9,9 +9,11 @@ import './App.css';
 function App() {
 
   const {
-    tasks, error, loading, pagination,
+    tasks, error, isFetchingTasks, pagination,
     currentPage, pageSize,
     search, completedFilter, sort, order,
+    isPlaceholderData,
+    isAddingTask, isDeletingTask, togglingTaskId, isEditingTask,
     handleAddTask, handleDeleteTask, handleToggleTaskCompletion, handleEditTask,
     handleNextPage, handlePreviousPage, handlePageSizeChange,
     handleSearchChange, handleCompletedFilterChange, handleSortChange, handleOrderChange
@@ -30,13 +32,13 @@ function App() {
         onSortChange={handleSortChange} onOrderChange={handleOrderChange}
         />
 
-        <TaskForm onSubmit={handleAddTask}/>
+        <TaskForm onSubmit={handleAddTask} isPending={isAddingTask}/>
       </div>
 
       <div className="loading-container">
-        {loading && <p role="status">Loading...</p>}
+        {isFetchingTasks && <p role="status">Loading...</p>}
         {error && <p role="alert">{error}</p>}
-        {!error && !loading && tasks.length === 0 && <p className="empty-tasks-message">No tasks found</p>}
+        {!error && !isFetchingTasks && tasks.length === 0 && <p className="empty-tasks-message">No tasks found</p>}
       </div>
 
       <TaskList 
@@ -44,10 +46,14 @@ function App() {
         onDeleteTask={handleDeleteTask} 
         onToggleTaskCompletion={handleToggleTaskCompletion} 
         onEditTask={handleEditTask}
+        isDeletingTask={isDeletingTask}
+        isEditingTask={isEditingTask}
+        togglingTaskId={togglingTaskId}
       />
 
       <Pagination pageSize={pageSize} pagination={pagination} currentPage={currentPage} 
         onNextPage={handleNextPage} onPreviousPage={handlePreviousPage} onPageSizeChange={handlePageSizeChange}
+        isPlaceholderData={isPlaceholderData}
       />
 
     </main>

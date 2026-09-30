@@ -18,9 +18,8 @@ async function getTasks (req, res) {
     
     // --------------- Sorting validation section -------------------------
     const sortField = sort ?? "title";
-    //const sortField = sort ?? "created_at";
     const sortOrder = (order ?? "asc").toLowerCase();
-    const allowedSorts = ["created_at", "title", "completed"];
+    const allowedSorts = ["title", "completed"];
 
     if (!allowedSorts.includes(sortField)) {
         return res.status(400).json({message: "Invalide sort field"});
@@ -54,7 +53,7 @@ async function getTasks (req, res) {
         values.push(completedValue);
     }
     if(searchValue !== undefined) {
-        conditions.push(`title ILIKE $${values.length + 1} OR description ILIKE $${values.length + 1}`);
+        conditions.push(`(title ILIKE $${values.length + 1} OR description ILIKE $${values.length + 1})`);
         values.push(`%${searchValue}%`);
     }
 
@@ -109,9 +108,6 @@ async function createTask (req, res) {
     }
     if (req.body.description !== undefined && typeof req.body.description !== "string") {
         return res.status(400).json({message: "Description must be a string"});
-    }
-    if (req.body.completed !== undefined && typeof req.body.completed !== "boolean") {
-        return res.status(400).json({message: "Completed must be a boolean"});
     }
 
     try {
